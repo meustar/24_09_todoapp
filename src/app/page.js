@@ -1,13 +1,31 @@
-import Image from "next/image";
+'use client';
+
+import * as React from 'react';
+import { AppBar, Toolbar } from '@mui/material';
+import { ThemeProvider } from '@emotion/react';
+import theme from './theme';
+import { FaBars } from 'react-icons/fa';
 
 export default function Home() {
   return (
     <>
-      <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <div className="z-10 max-w-5xl w-full items-center justify-between text-sm lg:flex">
-          안녕
-        </div>
-      </main>
+      {/* <AppBar position="static"> */}
+      <AppBar position="fixed">
+        <Toolbar>
+          <div className="tw-flex-1">
+            <FaBars />
+          </div>
+          <div className="logo-box">
+            <a href="/" className="tw-font-bold">
+              로고
+            </a>
+          </div>
+          <div className="tw-flex-1 tw-flex tw-justify-end">글쓰기</div>
+        </Toolbar>
+      </AppBar>
+      <section className="tw-h-screen tw-flex tw-items-center tw-justify-center tw-text-[2rem]">
+        section
+      </section>
     </>
   );
 }
