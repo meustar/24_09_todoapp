@@ -7,8 +7,8 @@ import {
   Button,
   Alert as MuiAlert,
   Snackbar,
-  IconButton,
-  CloseIcon,
+  Backdrop,
+  CircularProgress,
 } from '@mui/material';
 import { ThemeProvider } from '@mui/material';
 import { FaBars } from 'react-icons/fa';
@@ -45,25 +45,15 @@ export default function App() {
         </section>
       </ThemeProvider>
 
-      <section>
-        <Button onClick={() => setOpen(true)}>Open Snackbar</Button>
-        <Alert ref={alertRef} severity="error" variant="filled">
-          게시물이 삭제되었습니다.
-        </Alert>
-        <Alert ref={alertRef} severity="success" variant="outlined">
-          성공 메세지
-        </Alert>
-        <Snackbar
+      <div>
+        <Button onClick={() => setOpen(true)}>Show backdrop</Button>
+        <Backdrop
+          sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
           open={open}
-          autoHideDuration={2000}
-          onClose={() => setOpen(false)}
-          message="Note archived">
-          <Alert variant="outlined" severity="error">
-            게시물이 삭제
-            {/* 해당 Alert의 유무에 따라서 스낵바를 클릭했을 때 나오는 메세지가 달라짐 */}
-          </Alert>
-        </Snackbar>
-      </section>
+          onClick={() => setOpen(false)}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      </div>
     </>
   );
 }
