@@ -13,6 +13,9 @@ import {
   List,
   ListItemButton,
   Link,
+  ListItem,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import { ThemeProvider } from '@mui/material';
 import { FaBars } from 'react-icons/fa';
@@ -23,7 +26,7 @@ const Alert = React.forwardRef((props, ref) => {
 });
 
 export default function App() {
-  const [open, setOpen] = React.useState(false);
+  const [tabCurrentIndex, setTabCurrentIndex] = React.useState(0);
 
   const alertRef = React.useRef(null);
 
@@ -50,18 +53,14 @@ export default function App() {
       </ThemeProvider>
 
       <div>
-        <Button onClick={() => setOpen(true)}>Open drawer</Button>
-        <Drawer anchor="left" open={open} onClose={() => setOpen(false)}>
-          <List>
-            <ListItemButton>
-              <Link underline="none" href="/write">
-                글쓰기
-              </Link>
-            </ListItemButton>
-            <ListItemButton>사과</ListItemButton>
-            <ListItemButton>바나나</ListItemButton>
-          </List>
-        </Drawer>
+        <Tabs value={tabCurrentIndex} onChange={(_, newValue) => setTabCurrentIndex(newValue)}>
+          <Tab label="item 1" />
+          <Tab label="item 2" />
+          <Tab label="item 3" />
+        </Tabs>
+        {tabCurrentIndex == 0 && <div>내용1</div>}
+        {tabCurrentIndex == 1 && <div>내용2</div>}
+        {tabCurrentIndex == 2 && <div>내용3</div>}
       </div>
     </>
   );
