@@ -57,11 +57,20 @@ function useTodosStatus() {
       id,
       content: newContent,
       regDate: dateToStr(new Date()),
+      isChecked: false,
     };
     setTodos((todos) => [newTodo, ...todos]);
 
     return id;
   };
+
+  const toggleCheck = (id) => {
+    const newTodos = todos.map(
+      (todo) => (todo.id !== id ? todo : { ...todo, isChecked: !todo.isChecked }), // 체크 상태 토글
+    );
+    setTodos(newTodos);
+  };
+
   const removeTodo = (id) => {
     const newTodos = todos.filter((todo) => todo.id != id);
     setTodos(newTodos);
@@ -99,6 +108,7 @@ function useTodosStatus() {
   return {
     todos,
     addTodo,
+    toggleCheck,
     removeTodo,
     modifyTodo,
     findTodoById,
@@ -143,6 +153,7 @@ const NewTodoForm = ({ noticeSnackbarStatus }) => {
   );
 };
 const TodoListItem = ({ todo, index, openDrawer }) => {
+  const todosStatus = useTodosStatus();
   return (
     <>
       <li className="tw-mb-3" key={todo.id}>
@@ -157,14 +168,18 @@ const TodoListItem = ({ todo, index, openDrawer }) => {
             />
           </div>
           <div className="tw-rounded-[10px] tw-shadow tw-flex tw-text-[14px] tw-min-h-[80px]">
-            <Button className="tw-flex-shrink-0 tw-rounded-[10px_0_0_10px]" color="inherit">
+            <Button
+              className="tw-flex-shrink-0 tw-rounded-[10px_0_0_10px]"
+              color="inherit"
+              onClick={() => todosStatus.toggleCheck(todo.id)} // 버튼 클릭 시 체크 상태 변경
+            >
               <FaCheck
                 className={classNames(
                   'tw-text-3xl',
                   {
-                    'tw-text-[--mui-color-primary-main]': index % 2 == 0,
+                    'tw-text-[--mui-color-primary-main]': todo.isChecked, // 체크된 상태에 따라 색상 변경
                   },
-                  { 'tw-text-[#dcdcdc]': index % 2 != 0 },
+                  { 'tw-text-[#dcdcdc]': !todo.isChecked },
                 )}
               />
             </Button>
@@ -173,9 +188,7 @@ const TodoListItem = ({ todo, index, openDrawer }) => {
               할 일 : {todo.content}
             </div>
             <Button
-              onClick={() => {
-                openDrawer(todo.id);
-              }}
+              onClick={() => openDrawer(todo.id)}
               className="tw-flex-shrink-0 tw-rounded-[0_10px_10px_0]"
               color="inherit">
               <FaEllipsisV className="tw-text-[#dcdcdc] tw-text-2xl" />
