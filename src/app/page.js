@@ -26,7 +26,6 @@ import dateToStr from './dateUtil';
 import RootTheme from './theme';
 
 function useTodoStatus() {
-  console.log('실행 1');
   const [todos, setTodos] = React.useState([]);
   const lastTodoIdRef = React.useRef(0);
 
@@ -43,15 +42,43 @@ function useTodoStatus() {
     const newTodos = todos.filter((todo) => todo.id != id);
     setTodos(newTodos);
   };
+  // modify v1
   const modifyTodo = (id, content) => {
     const newTodos = todos.map((todo) => (todo.id != id ? todo : { ...todo, content }));
     setTodos(newTodos);
+  };
+  // modify v2
+  const modifyTodoByIndex = (index, newContent) => {
+    const newTodos = todos.map((todo, _index) =>
+      _index != index ? todo : { ...todo, content: newContent },
+    );
+    setTodos(newTodos);
+  };
+  // modify v2
+  const modifyTodoById = (id, newContent) => {
+    const index = findTodoIndexById(id);
+    if (index == -1) {
+      return null;
+    }
+    modifyTodoByIndex(index, newContent);
+  };
+  const findTodoIndexById = (id) => {
+    return todos.findIndex((todo) => todo.id == id);
+  };
+  const findTodoById = (id) => {
+    const index = findTodoIndexById(id);
+    if (index == -1) {
+      return null;
+    }
+    return todos[index];
   };
   return {
     todos,
     addTodo,
     removeTodo,
     modifyTodo,
+    findTodoById,
+    modifyTodoById,
   };
 }
 
@@ -69,6 +96,7 @@ const NewTodoForm = ({ todosState }) => {
     form.content.value = '';
     form.content.focus();
   };
+
   return (
     <>
       <form className="tw-flex tw-flex-col tw-p-4 tw-gap-2" onSubmit={(e) => onSubmit(e)}>
@@ -88,7 +116,7 @@ const NewTodoForm = ({ todosState }) => {
     </>
   );
 };
-const TodoListItem = ({ todo, index, openDrawer }) => {
+const TodoListItem = ({ todo, index, openDrawer, todosState }) => {
   return (
     <>
       <li className="tw-mb-3" key={todo.id}>
@@ -132,10 +160,12 @@ const TodoListItem = ({ todo, index, openDrawer }) => {
     </>
   );
 };
+
 // 해당 todo option에 대한 drawer 열기, 닫기
 function useTodoOptionDrawerStatus() {
   const [todoId, setTodoId] = React.useState(null);
   const opened = React.useMemo(() => todoId !== null, [todoId]);
+
   const open = (id) => setTodoId(id);
   const close = () => setTodoId(null);
   return {
@@ -149,23 +179,72 @@ function useTodoOptionDrawerStatus() {
 // modal 열기, 닫기
 function useEditTodoModalStatus() {
   const [opened, setOpened] = React.useState(false);
+
   const open = () => {
     setOpened(true);
   };
+
   const close = () => {
     setOpened(false);
   };
+
   return {
     opened,
     open,
     close,
   };
+}
 
-  function TodoOptionDrawer({ status }) {
-    const editTodoModalStatus = useEditTodoModalStatus();
-
+function EditTodoModal({ status, todosState, todo }) {
+  const onSubmit = (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    form.content.value = form.content.value.trim();
+    if (form.content.value.length == 0) {
+      alert('할 일 써');
+      form.content.focus();
+      return;
+    }
+    // modify v1
+    todosState.modifyTodo(todo.id, form.content.value);
+    status.close();
+    // modify v2
+    // todosState.modifyTodoById(todo.id, form.content.value);
+  };
   return (
     <>
+      <Modal
+        open={status.opened}
+        onClose={status.close}
+        className="tw-flex tw-justify-center tw-items-center">
+        <div className="tw-bg-white tw-p-10 tw-rounded-[20px] tw-w-full tw-max-w-lg">
+          <form onSubmit={onSubmit} className="tw-flex tw-flex-col tw-gap-2">
+            <TextField
+              minRows={3}
+              maxRows={10}
+              multiline
+              name="content"
+              autoComplete="off"
+              variant="outlined"
+              label="할 일 써"
+              defaultValue={todo?.content}
+            />
+            <Button variant="contained" className="tw-font-bold" type="submit">
+              수정
+            </Button>
+          </form>
+        </div>
+      </Modal>
+    </>
+  );
+}
+function TodoOptionDrawer({ status, todosState }) {
+  const editTodoModalStatus = useEditTodoModalStatus();
+
+  const todo = todosState.findTodoById(status.todoId);
+  return (
+    <>
+      <EditTodoModal status={editTodoModalStatus} todosState={todosState} todo={todo} />
       <SwipeableDrawer anchor="top" open={status.opened} onClose={status.close} onOpen={() => {}}>
         <List>
           <ListItem className="tw-flex tw-gap-2 tw-p-[15px]">
@@ -185,20 +264,17 @@ function useEditTodoModalStatus() {
           </ListItemButton>
         </List>
       </SwipeableDrawer>
-      <Modal
-        open={editTodoModalStatus.opened}
-        onClose={editTodoModalStatus.close}
-        className="tw-flex tw-justify-center tw-items-center">
-        <div className="tw-bg-white tw-p-10 tw-rounded-[20px]">안녕</div>
-      </Modal>
     </>
   );
 }
+
 const TodoList = ({ todosState }) => {
   const todoOptionDrawerStatus = useTodoOptionDrawerStatus();
+
   return (
     <>
-      <TodoOptionDrawer status={todoOptionDrawerStatus} />
+      <TodoOptionDrawer status={todoOptionDrawerStatus} todosState={todosState} />
+
       <nav>
         할 일 갯수 : {todosState.todos.length}
         <ul>
@@ -208,6 +284,7 @@ const TodoList = ({ todosState }) => {
               todo={todo}
               index={index}
               openDrawer={todoOptionDrawerStatus.open}
+              todosState={todosState}
             />
           ))}
         </ul>
