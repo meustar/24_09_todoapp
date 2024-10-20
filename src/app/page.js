@@ -10,6 +10,10 @@ import {
   CssBaseline,
   Chip,
   Drawer,
+  SwipeableDrawer,
+  List,
+  ListItem,
+  Divider,
   Box,
 } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
@@ -141,11 +145,17 @@ function useTodoOptionDrawerStatus() {
 function TodoOptionDrawer({ status }) {
   return (
     <>
-      <Drawer anchor="bottom" open={status.opened} onClose={status.close}>
-        <div className="tw-p-[30px] tw-flex tw-gap-x-[5px]">
-          {status.todoId}번 todo에 대한 옵션 Drawer
-        </div>
-      </Drawer>
+      <SwipeableDrawer anchor="left" open={status.opened} onClose={status.close}>
+        <List>
+          <ListItem className="tw-flex tw-gap-2 tw-p-[15px]">
+            <span className="tw-text-[--mui-color-primary-main]">{status.todoId}번 </span>
+            <span>Your Todo</span>
+          </ListItem>
+          <Divider className="tw-my-[5px]" />
+          <ListItem className="tw-p-[15px_20px]">수정</ListItem>
+          <ListItem className="tw-p-[15px_20px]">삭제</ListItem>
+        </List>
+      </SwipeableDrawer>
     </>
   );
 }
