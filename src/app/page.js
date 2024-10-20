@@ -13,8 +13,8 @@ import {
 } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
 import { FaBars } from 'react-icons/fa';
-import theme from './theme';
 import dateToStr from './dateUtil';
+import RootTheme from './theme';
 
 function useTodoStatus() {
   console.log('실행 1');
@@ -30,17 +30,14 @@ function useTodoStatus() {
     };
     setTodos((todos) => [newTodo, ...todos]);
   };
-
   const removeTodo = (id) => {
     const newTodos = todos.filter((todo) => todo.id != id);
     setTodos(newTodos);
   };
-
   const modifyTodo = (id, content) => {
     const newTodos = todos.map((todo) => (todo.id != id ? todo : { ...todo, content }));
     setTodos(newTodos);
   };
-
   return {
     todos,
     addTodo,
@@ -63,7 +60,7 @@ const NewTodoForm = ({ todoStatus }) => {
         <input
           className="input input-bordered"
           type="text"
-          placeholder="새 할 일을 입력하세요"
+          placeholder="새 할일 입력해"
           value={newTodoTitle}
           onChange={(e) => setNewTodoTitle(e.target.value)}
         />
@@ -126,7 +123,6 @@ const TodoListItem = ({ todo, todoStatus }) => {
     </li>
   );
 };
-
 const TodoList = ({ todoStatus }) => {
   return (
     <>
@@ -152,19 +148,20 @@ function App() {
   AppCallCount++;
   console.log(`AppCallCount : ${AppCallCount}`);
 
-  const todosState = useTodoStatus(); //  커스텀 훅
+  const todosState = useTodoStatus(); // 커스텀 훅
 
   React.useEffect(() => {
     todosState.addTodo('스쿼트');
     todosState.addTodo('벤치프레스');
     todosState.addTodo('데드리프트\n런지');
   }, []);
+
   const onSubmit = (e) => {
     e.preventDefault();
     const form = e.currentTarget;
     form.content.value = form.content.value.trim();
     if (form.content.value.length == 0) {
-      alert('할 일 쓰세요');
+      alert('할 일 써');
       form.content.focus();
       return;
     }
@@ -207,7 +204,7 @@ function App() {
       <nav>
         <ul>
           {todosState.todos.map((todo) => (
-            <li key={todo.id}>
+            <li className="tw-mb-3" key={todo.id}>
               <div className="tw-flex tw-flex-col tw-gap-1 tw-mb-[30px]">
                 <Chip
                   className="tw-pt-3"
@@ -218,8 +215,16 @@ function App() {
                   className="tw-pt-3"
                   label={`날짜 : ${todo.regDate}`}
                   variant="outlined"></Chip>
-                <div className="tw-p-8 tw-rounded-[15px] tw-shadow tw-whitespace-pre-wrap tw-leanding-relaxed tw-break-words">
-                  <Box sx={{ color: 'secondary.dark' }}>할 일 : {todo.content}</Box>
+                <div className="tw-flex tw-p-8 tw-rounded-[15px] ">
+                  <Button className="tw-flex-shrink-0 tw-rounded-[20px_0_0_20px] hover:tw-bg-blue-300 tw-items-center">
+                    <span>체크박스</span>
+                  </Button>
+                  <div className="tw-flex-grow tw-text-[--mui-color-success-main] hover:tw-text-[--mui-color-info-main] tw-shadow tw-whitespace-pre-wrap tw-leading-relaxed tw-break-words">
+                    할 일 : {todo.content}
+                  </div>
+                  <div className="tw-flex-shrink-0 tw-bg-green-500 tw-w-[150px]">
+                    삭제 버튼 예정
+                  </div>
                 </div>
               </div>
             </li>
@@ -231,6 +236,7 @@ function App() {
 }
 
 export default function themeApp() {
+  const theme = RootTheme();
   console.log('실행 2');
 
   return (
