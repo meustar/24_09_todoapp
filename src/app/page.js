@@ -48,6 +48,30 @@ function useTodosStatus() {
 
   lastTodoIdRef.current = lastTodoId;
 
+  // 로컬 스토리지에서 할 일 목록을 불러오기
+  const [isLoaded, setIsLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    const savedTodos = JSON.parse(localStorage.getItem('todos')) || [];
+    const savedLastTodoId = parseInt(localStorage.getItem('lastTodoId')) || 0;
+
+    console.log('savedTodos:', savedTodos); // 디버깅용 로그
+    console.log('savedLastTodoId:', savedLastTodoId); // 디버깅용 로그
+
+    setTodos(savedTodos);
+    setLastTodoId(savedLastTodoId);
+    setIsLoaded(true); // 데이터 불러온 후에 로드 상태 변경
+  }, []);
+
+  // 할 일 목록이 변경될 때마다 로컬 스토리지에 저장
+  React.useEffect(() => {
+    console.log('Storing todos in localStorage:', todos); // 디버깅용 로그
+    console.log('Storing lastTodoId in localStorage:', lastTodoId); // 디버깅용 로그
+
+    localStorage.setItem('todos', JSON.stringify(todos));
+    localStorage.setItem('lastTodoId', lastTodoId);
+  }, [todos, lastTodoId]);
+
   const addTodo = (newContent) => {
     const id = ++lastTodoIdRef.current;
 
