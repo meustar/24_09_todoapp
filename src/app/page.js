@@ -22,13 +22,21 @@ import {
 } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
 import classNames from 'classnames';
+import { RecoilRoot, atom, selector, useRecoilState, useRecoilValue } from 'recoil';
 import { FaBars, FaCheck, FaEllipsisH, FaTrash, FaEllipsisV } from 'react-icons/fa';
 import { FaPenToSquare } from 'react-icons/fa6';
 import dateToStr from './dateUtil';
 import RootTheme from './theme';
 
+const todosAtom = atom({
+  key: 'app/todosAtom',
+  default: [],
+});
+
 function useTodoStatus() {
-  const [todos, setTodos] = React.useState([]);
+  const [todos, setTodos] = useRecoilState(todosAtom); // 리코일 사용
+
+  // const [todos, setTodos] = React.useState([]);
   const lastTodoIdRef = React.useRef(0);
 
   const addTodo = (newContent) => {
@@ -410,9 +418,11 @@ export default function themeApp() {
   const theme = RootTheme();
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <App />
-    </ThemeProvider>
+    <RecoilRoot>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <App />
+      </ThemeProvider>
+    </RecoilRoot>
   );
 }
