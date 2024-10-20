@@ -138,23 +138,24 @@ function useTodoOptionDrawerStatus() {
     opened,
   };
 }
-const TodoList = ({ todosState }) => {
-  const todoOptionDrawerStatus = useTodoOptionDrawerStatus();
-
+function TodoOptionDrawer({ status }) {
   return (
     <>
-      <Drawer
-        anchor="bottom"
-        open={todoOptionDrawerStatus.opened}
-        onClose={todoOptionDrawerStatus.close}>
+      <Drawer anchor="bottom" open={status.opened} onClose={status.close}>
         <div className="tw-p-[30px] tw-flex tw-gap-x-[5px]">
-          {todoOptionDrawerStatus.todoId}번 todo에 대한 옵션 Drawer
-          <div>수정</div>
-          <div>삭제</div>
+          {status.todoId}번 todo에 대한 옵션 Drawer
         </div>
       </Drawer>
-      <div className="tw-mb-2">할 일 갯수 : {todosState.todos.length}</div>
+    </>
+  );
+}
+const TodoList = ({ todosState }) => {
+  const todoOptionDrawerStatus = useTodoOptionDrawerStatus();
+  return (
+    <>
+      <TodoOptionDrawer status={todoOptionDrawerStatus} />
       <nav>
+        할 일 갯수 : {todosState.todos.length}
         <ul>
           {todosState.todos.map((todo, index) => (
             <TodoListItem
